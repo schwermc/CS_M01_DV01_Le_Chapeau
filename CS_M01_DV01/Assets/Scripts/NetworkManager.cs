@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public static NetworkManager instance;
@@ -40,10 +41,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LoadLevel(sceneName);
     }
 
+    /*
     public override void OnConnectedToMaster()
     {
         CreateRoom("testroom");
     }
+    */
 
     public override void OnCreatedRoom()
     {
