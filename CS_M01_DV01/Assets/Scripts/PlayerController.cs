@@ -21,14 +21,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Update()
     {
-        Move();
+        if (photonView.IsMine)
+        {
+            Move();
 
-        if (Input.GetKeyDown(KeyCode.Space))
-            TryJump();
+            if (Input.GetKeyDown(KeyCode.Space))
+                TryJump();
 
-        // Track the amount of time we're wearing the hat
-        if (hatObject.activeInHierarchy)
-            curHatTime += Time.deltaTime;
+            // Track the amount of time we're wearing the hat
+            if (hatObject.activeInHierarchy)
+                curHatTime += Time.deltaTime;
+        }
 
         // The host will check if the player has won
         if (PhotonNetwork.IsMasterClient)
@@ -107,6 +110,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (stream.IsWriting)
             stream.SendNext(curHatTime);
+
         else if (stream.IsReading)
             curHatTime = (float)stream.ReceiveNext();
     }
