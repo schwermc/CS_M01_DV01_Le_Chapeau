@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public string playerPrefabLocation; // Path in Resources folder to the Player prefab
     public Transform[] spawnPoints;     // Array of all available spawn points
     public PlayerController[] players;  // Array of all the players
-    public int playerWithhat;           // ID of the player with the hat
+    public int playerWithHat;           // ID of the player with the hat
     public int playersInGame;           // Number of players in the game
 
     // instance
@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     void SpawnPlayer()
     {
         // Instantiate the player across the nertwork
-        GameObject playerObj = PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[Random.Range(0, spawnPoints.Length)], Quaternion.identity);
+        GameObject playerObj = PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
 
         // Get the player script
         PlayerController playerScript = playerObj.GetComponent<PlayerController>();
@@ -62,5 +62,29 @@ public class GameManager : MonoBehaviourPunCallbacks
     public PlayerController GetPlayer(GameObject playerObject)
     {
         return players.First(x => x.gameObject == playerObject); // page 40 + 38 for gamemanager
+    }
+
+
+    // Called when a player hits the hatted player - giving them the hat
+    [PunRPC]
+    public void GiveHat(int playerId, bool initialGive)
+    {
+        // Remove the hat from the currently hatted player
+        if (!initialGive)
+            GetPlayer(playerWithHat).SetHat(false);
+
+        // Give the hat to the new player
+        playerWithHat = playerId;
+        GetPlayer(playerId).SetHat(true);
+        hatPickupTime = Time.time;
+    }
+
+    // Is the player able to take the hat at this current time?
+    public bool CanGetHat()
+    {
+        if (Time.time > hatPickupTime + invincibleDuration)
+            return true;
+        else
+            return false;
     }
 }

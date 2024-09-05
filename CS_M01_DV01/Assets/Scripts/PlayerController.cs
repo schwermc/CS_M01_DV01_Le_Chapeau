@@ -2,7 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
     [HideInInspector]
     public int id;
@@ -53,11 +53,39 @@ public class PlayerController : MonoBehaviour
         GameManager.instance.players[id - 1] = this;
 
         // Give the first player the hat
-
+        if (id == 1)
+            GameManager.instance.GiveHat(id, true);
 
         // If this isn't out local player, disable physics as that's
         //   controlled by the user and synce to all other clients
         if(!photonView.IsMine)
             rig.isKinematic = true;
+    }
+
+    // Set the player's hat avtive or not
+    public void SetHat(bool hasHat)
+    {
+        hatObject.SetActive(hasHat);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!photonView.IsMine)
+            return;
+
+        // Did we hit another player?
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // Do they have the hat?
+            if (GameManager.instance.GetPlayer(collision.gameObject).id == GameManager.instance.playerWithHat)
+            {
+                // Can we get the hat?
+                if (GameManager.instance.CanGetHat())
+                {
+                    // Give us the hat
+                    GameManager.instance.photonView.RPC("GiveHat", RpcTarget.All, id, false);
+                }
+            }
+        }
     }
 }
