@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     // Called when the Player object is instantiated
     [PunRPC]
-    public void Initialized(Player player)
+    public void Initialize(Player player)
     {
         photonPlayer = player; ;
         id = player.ActorNumber;
